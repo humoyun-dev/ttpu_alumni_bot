@@ -1,0 +1,14 @@
+version: "3.9"
+
+services:
+  bot:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      GOOGLE_SERVICE_ACCOUNT_FILE: /app/service_account.json
+      LOCAL_EXCEL_FILE: /app/responses.xlsx
+    volumes:
+      - ./service_account.json:/app/service_account.json:ro
+      - ./responses.xlsx:/app/responses.xlsx:rw

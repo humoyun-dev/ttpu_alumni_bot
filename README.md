@@ -38,6 +38,28 @@ python main.py
 ```
 If Telegram returns `Unauthorized`, the token is invalid or revoked; update `TELEGRAM_BOT_TOKEN` and retry.
 
+### Run with Docker
+- Build the image: `docker build -t bot-bitiruvchi .`
+- Make sure your `.env` has the required variables. Point `GOOGLE_SERVICE_ACCOUNT_FILE` (and optionally `LOCAL_EXCEL_FILE`) to paths **inside** the container (e.g. `/app/service_account.json`).
+- Run the container, mounting the service account JSON (and optional local Excel backup) into those paths:
+```bash
+docker run --rm \
+  --env-file .env \
+  -v /full/path/service_account.json:/app/service_account.json:ro \
+  -v /full/path/responses.xlsx:/app/responses.xlsx:rw \  # optional
+  bot-bitiruvchi
+```
+- The bot starts with `python main.py` and loads env vars at runtime; stop it with `Ctrl+C` or `docker stop <container>`.
+
+### Run with Docker Compose
+- Ensure `.env` is filled. `GOOGLE_SERVICE_ACCOUNT_FILE` and optional `LOCAL_EXCEL_FILE` should point to `/app/service_account.json` and `/app/responses.xlsx` respectively (the paths used inside the container).
+- Put your service account JSON in the project root (or update the volume path below).
+- Run:
+```bash
+docker compose up -d --build
+```
+- Stop and remove: `docker compose down`
+
 ## Google Sheets setup
 - The bot writes rows to `GOOGLE_SHEET_ID`, to the worksheet named `GOOGLE_WORKSHEET_NAME` (or the first sheet if not provided).
 - On startup it ensures the header row matches the expected schema; if the sheet is empty it seeds it, otherwise it rewrites a mismatched header.
